@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>QR Code Generator</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+
+<body>
+<div class="container">
+    <p>Enter your text or URL</p>
+    <input type="text" placeholder="Text or URL" id="qrText">
+    <button onclick="generateQR()">Generate</button>
+    <div id="imgBox">
+        <img src="" id="qrImage">
+        <div id="qrActions" style="display:none; text-align:center; margin-top:10px;">
+            <button onclick="copyQR()">Copy Image</button>
+            <button onclick="downloadQR()">Download Image</button>
+        </div>
+    </div>
+</div>
+<script>
+    let imgBox = document.getElementById("imgBox")
+    let qrImage = document.getElementById("qrImage")
+    let qrText = document.getElementById("qrText")
+    let qrActions = document.getElementById("qrActions")
+
+    // Listen for Enter key on input
+    qrText.addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            generateQR();
+        }
+    });
+
+    function generateQR(){
+        if(qrText.value.length > 0){
+            qrImage.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + encodeURIComponent(qrText.value);
+            imgBox.classList.add("show-img");
+            qrActions.style.display = "block";
+        } else {
+            qrText.classList.add("error");
+            setTimeout(() => {
+                qrText.classList.remove('error');
+            }, 1000);   
+        }
+    }
+
+    function copyQR() {
+        fetch(qrImage.src)
+            .then(res => res.blob())
+            .then(blob => {
+                const item = new ClipboardItem({ "image/png": blob });
+                navigator.clipboard.write([item]);
+                alert("QR code copied to clipboard!");
+            });
+    }
+
+    function downloadQR() {
+        const link = document.createElement('a');
+        link.href = qrImage.src;
+        link.download = "qrcode.png";
+        link.click();
+    }
+</script>
+
+</body>
+</html>
+
+
+
+
